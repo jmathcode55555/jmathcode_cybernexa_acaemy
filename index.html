@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JMATHCODE CyberNexa Academy</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font - Orbitron for a techy cyberpunk look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS for cyberpunk effects */
+        :root {
+            --neon-green: #39FF14;
+            --dark-blue: #000080;
+            --purple: #8A2BE2;
+        }
+        body {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            background-color: #000;
+            overflow-x: hidden;
+        }
+        .neon-text-shadow {
+            text-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green), 0 0 15px var(--dark-blue), 0 0 20px var(--dark-blue);
+        }
+        .neon-glow-hover:hover {
+            box-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green), 0 0 15px var(--dark-blue);
+            transform: translateY(-2px);
+        }
+        .neon-button-glow {
+            box-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green);
+        }
+        .neon-button-glow:hover {
+            box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--dark-blue);
+        }
+        .card-glow {
+            border: 2px solid var(--neon-green);
+            transition: all 0.3s ease-in-out;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .card-glow:hover {
+            box-shadow: 0 0 15px var(--neon-green), 0 0 20px var(--dark-blue);
+            transform: translateY(-5px);
+        }
+        .blinking-cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+        .gemini-response {
+            white-space: pre-wrap; /* Preserve whitespace and line breaks */
+            text-align: left;
+        }
+
+        /* Styling for the canvas code-rain effect */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* Modal styling */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background-color: black;
+            border: 2px solid var(--neon-green);
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--neon-green);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+
+    <!-- The Canvas for the Code Rain Effect -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- Main Container -->
+    <div class="relative z-10 min-h-screen flex flex-col items-center p-4 text-center">
+
+        <!-- Navigation Bar -->
+        <nav class="fixed top-0 left-0 right-0 p-6 flex justify-between items-center bg-transparent backdrop-blur-sm z-50">
+            <a href="#home" class="cursor-pointer" onclick="showSection('home')">
+                <h1 class="text-2xl md:text-3xl font-bold neon-text-shadow">
+                    <span class="text-red-500">JMATHCODE</span> CyberNexa Academy
+                </h1>
+            </a>
+            <div id="nav-menu" class="space-x-8 text-lg hidden md:flex">
+                <a href="#home" class="nav-link transition-all duration-300 hover:text-cyan-400 neon-glow-hover p-2 rounded-md">হোম</a>
+                <a href="#learning" class="nav-link transition-all duration-300 hover:text-cyan-400 neon-glow-hover p-2 rounded-md">লার্নিং</a>
+                <a href="#tools" class="nav-link transition-all duration-300 hover:text-cyan-400 neon-glow-hover p-2 rounded-md">টুলস</a>
+                <a href="#blog" class="nav-link transition-all duration-300 hover:text-cyan-400 neon-glow-hover p-2 rounded-md">ব্লগ</a>
+                <a href="#community" class="nav-link transition-all duration-300 hover:text-cyan-400 neon-glow-hover p-2 rounded-md">কমিউনিটি</a>
+                <a href="#contact" class="nav-link transition-all duration-300 hover:text-cyan-400 neon-glow-hover p-2 rounded-md">যোগাযোগ</a>
+            </div>
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-2xl">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-90 z-40 hidden flex-col items-center justify-center space-y-8 text-2xl backdrop-blur-md">
+            <button id="close-menu-btn" class="absolute top-6 right-6 text-2xl"><i class="fa-solid fa-xmark"></i></button>
+            <h1 class="text-4xl font-bold neon-text-shadow mb-4">
+                <span class="text-red-500">JMATHCODE</span> CyberNexa Academy
+            </h1>
+            <a href="#home" class="mobile-nav-link p-4 hover:text-cyan-400">হোম</a>
+            <a href="#learning" class="mobile-nav-link p-4 hover:text-cyan-400">লার্নিং</a>
+            <a href="#tools" class="mobile-nav-link p-4 hover:text-cyan-400">টুলস</a>
+            <a href="#blog" class="mobile-nav-link p-4 hover:text-cyan-400">ব্লগ</a>
+            <a href="#community" class="mobile-nav-link p-4 hover:text-cyan-400">কমিউনিটি</a>
+            <a href="#contact" class="mobile-nav-link p-4 hover:text-cyan-400">যোগাযোগ</a>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="w-full mt-24">
+            <!-- Home Section -->
+            <section id="home" class="min-h-screen flex flex-col justify-center items-center pt-20 pb-10 px-4 active-section">
+                <!-- Hero Section -->
+                <div class="flex flex-col items-center justify-center mb-16">
+                    <h1 class="text-5xl md:text-7xl font-extrabold mb-4 neon-text-shadow">
+                        <span class="text-red-500">JMATHCODE</span> CyberNexa Academy
+                    </h1>
+                    <p class="text-base md:text-xl max-w-3xl mb-8 leading-relaxed text-gray-300">
+                        নৈতিকভাবে হ্যাকিং এবং সাইবার সিকিউরিটি শিখুন। এখানে আপনি শিখবেন কীভাবে সাইবার আক্রমণ থেকে নিজেদের এবং অন্যদের রক্ষা করতে হয়।
+                    </p>
+                    <!-- CEO পরিচিতি বাটন, যা পপ-আপ খুলবে -->
+                    <button id="show-ceo-modal" class="px-8 py-3 bg-transparent text-white font-bold rounded-lg border-2 border-neon-green neon-button-glow transition-all duration-300 hover:bg-neon-green hover:text-black">
+                        CEO পরিচিতি
+                    </button>
+                </div>
+
+                <!-- Feature Highlights -->
+                <div class="container mx-auto p-4 grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+                    <!-- Learning Card -->
+                    <div class="card-glow p-6 rounded-xl flex flex-col items-center text-center">
+                        <i class="fa-solid fa-terminal text-5xl mb-4 text-purple"></i>
+                        <h3 class="text-2xl font-bold mb-2">লার্নিং</h3>
+                        <p class="text-gray-400">বেসিক থেকে অ্যাডভান্স টিউটোরিয়াল, ভিডিও এবং ডকুমেন্টেশন।</p>
+                    </div>
+                    <!-- Tools Card -->
+                    <div class="card-glow p-6 rounded-xl flex flex-col items-center text-center">
+                        <i class="fa-solid fa-wrench text-5xl mb-4 text-purple"></i>
+                        <h3 class="text-2xl font-bold mb-2">টুলস</h3>
+                        <p class="text-gray-400">জনপ্রিয় হ্যাকিং টুলস এবং সেগুলোর নিরাপদ ব্যবহার শিখুন।</p>
+                    </div>
+                    <!-- Blog Card -->
+                    <div class="card-glow p-6 rounded-xl flex flex-col items-center text-center">
+                        <i class="fa-solid fa-newspaper text-5xl mb-4 text-purple"></i>
+                        <h3 class="text-2xl font-bold mb-2">ব্লগ</h3>
+                        <p class="text-gray-400">সর্বশেষ সাইবার সিকিউরিটি নিউজ ও নিরাপত্তা টিপস পড়ুন।</p>
+                    </div>
+                    <!-- Community Card -->
+                    <div class="card-glow p-6 rounded-xl flex flex-col items-center text-center">
+                        <i class="fa-solid fa-users text-5xl mb-4 text-purple"></i>
+                        <h3 class="text-2xl font-bold mb-2">কমিউনিটি</h3>
+                        <p class="text-gray-400">অন্যান্য ইউজারদের সাথে আলোচনা করুন এবং প্রশ্ন করুন।</p>
+                    </div>
+                </div>
+
+                <!-- Quick Social Media Bar -->
+                <div class="fixed bottom-0 left-0 p-4 w-full flex justify-center space-x-6 text-3xl">
+                    <a href="https://web.facebook.com/profile.php?id=61577052354104" target="_blank" class="text-gray-400 hover:text-blue-600 transition-colors duration-300"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.youtube.com/@JMATHCODE" target="_blank" class="text-gray-400 hover:text-red-600 transition-colors duration-300"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.instagram.com/jmathcode/?__pwa=1" target="_blank" class="text-gray-400 hover:text-pink-500 transition-colors duration-300"><i class="fab fa-instagram"></i></a>
+                    <a href="https://x.com/jia75984" target="_blank" class="text-gray-400 hover:text-blue-400 transition-colors duration-300"><i class="fab fa-x-twitter"></i></a>
+                    <a href="https://web.telegram.org/a/#8135521250" target="_blank" class="text-gray-400 hover:text-cyan-500 transition-colors duration-300"><i class="fab fa-telegram"></i></a>
+                    <a href="https://www.threads.com/?xmt=AQF0TRiB6YtDnv0WOOkTPsGY3yDj81vjpwV8pFCsfiqx9Gg" target="_blank" class="text-gray-400 hover:text-purple-600 transition-colors duration-300"><i class="fa-brands fa-threads"></i></a>
+                </div>
+            </section>
+            
+            <!-- CEO Profile Modal -->
+            <div id="ceo-modal" class="modal hidden">
+                <div class="modal-content text-center">
+                    <span id="close-ceo-modal" class="close-btn">&times;</span>
+                    <img src="https://placehold.co/200x200/A020F0/ffffff?text=CEO" alt="CEO Profile Picture" class="w-48 h-48 object-cover rounded-full border-4 border-neon-green neon-glow-hover mx-auto mb-4">
+                    <h3 class="text-4xl font-bold mb-2 text-purple">Jeyaul Hoque (Jaber)</h3>
+                    <h4 class="text-xl text-gray-300 mb-4">প্রতিষ্ঠাতা ও সিইও, JMATHCODE CyberNexa Academy</h4>
+                    <p class="text-lg leading-relaxed text-gray-400">
+                        আসসালামু আলাইকুম, আমার নাম Jeyaul Hoque (Jaber) এবং আমি JMATHCODE এর প্রতিষ্ঠাতা। আমি একজন ছাত্র এবং শিখছি, অনেক কিছু শিখতে হবে। যদি আপনারা আমাকে কিছু উপদেশ বা কিছু শিখাতে চান তাহলে আমার টেলিগ্রাম মেসেজ দিতে পারেন। ভবিষ্যতে ইনশাআল্লাহ আমার ওয়েবসাইটে হ্যাকিং বিষয়ে অনেক কিছু যুক্ত হবে ইনশাআল্লাহ, তাই আপনারা যুক্ত থাকুন।
+                    </p>
+                </div>
+            </div>
+
+            <!-- Learning Section -->
+            <section id="learning" class="min-h-screen p-10 hidden">
+                <h2 class="text-4xl md:text-5xl font-bold mb-10 text-center neon-text-shadow">লার্নিং সেকশন</h2>
+                <div class="container mx-auto text-left">
+                    <!-- Basic Level -->
+                    <div class="card-glow p-6 rounded-xl mb-8">
+                        <h3 class="text-3xl font-bold mb-4 text-purple">১. বেসিক লেভেল (শুরুর জন্য)</h3>
+                        <div class="ml-4">
+                            <h4 class="text-2xl font-bold mt-4 mb-2">ভিডিও টিউটোরিয়াল</h4>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>
+                                    <a href="https://www.youtube.com/@w3schools-com" target="_blank" class="text-neon-green hover:underline">
+                                        W3Schools YouTube – ওয়েব ও প্রোগ্রামিং বেসিক
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/@ProgrammingHero" target="_blank" class="text-neon-green hover:underline">
+                                        Programming Hero Bangla – বাংলা ভাষায় প্রোগ্রামিং বেসিক
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/@LearnwithSumit" target="_blank" class="text-neon-green hover:underline">
+                                        Learn with Sumit – ওয়েব ডেভেলপমেন্ট বেসিক থেকে প্র্যাক্টিক্যাল
+                                    </a>
+                                </li>
+                            </ul>
+                            <h4 class="text-2xl font-bold mt-6 mb-2">ডকুমেন্টেশন / ওয়েবসাইট</h4>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>
+                                    <a href="https://www.w3schools.com/" target="_blank" class="text-neon-green hover:underline">
+                                        W3Schools – HTML, CSS, JS, Python ইত্যাদি সহজ ব্যাখ্যা
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://developer.mozilla.org/" target="_blank" class="text-neon-green hover:underline">
+                                        MDN Web Docs – ওয়েব টেকনোলজির অফিসিয়াল ডকুমেন্টেশন
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.kaggle.com/learn" target="_blank" class="text-neon-green hover:underline">
+                                        Kaggle Learn – Data Science & ML এর বেসিক টিউটোরিয়াল
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Intermediate Level -->
+                    <div class="card-glow p-6 rounded-xl mb-8">
+                        <h3 class="text-3xl font-bold mb-4 text-purple">২. ইন্টারমিডিয়েট লেভেল</h3>
+                        <div class="ml-4">
+                            <h4 class="text-2xl font-bold mt-4 mb-2">ভিডিও কোর্স</h4>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>
+                                    <a href="https://www.youtube.com/@freecodecamp" target="_blank" class="text-neon-green hover:underline">
+                                        FreeCodeCamp – Full Stack, Python, Data Science, AI ফ্রি কোর্স
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/@coreyms" target="_blank" class="text-neon-green hover:underline">
+                                        Corey Schafer – Python, Git, Flask, Django ডিটেইল টিউটোরিয়াল
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/@TraversyMedia" target="_blank" class="text-neon-green hover:underline">
+                                        Traversy Media – ওয়েব ডেভেলপমেন্ট প্রোজেক্ট-ভিত্তিক শেখা
+                                    </a>
+                                </li>
+                            </ul>
+                            <h4 class="text-2xl font-bold mt-6 mb-2">ডকুমেন্টেশন / প্র্যাক্টিস সাইট</h4>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>
+                                    <a href="https://realpython.com/" target="_blank" class="text-neon-green hover:underline">
+                                        Real Python – Python প্র্যাক্টিক্যাল গাইড
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.geeksforgeeks.org/" target="_blank" class="text-neon-green hover:underline">
+                                        GeeksforGeeks – Data Structure, Algorithms ও Competitive Programming
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://leetcode.com/" target="_blank" class="text-neon-green hover:underline">
+                                        LeetCode – সমস্যা সমাধান করে প্রোগ্রামিং স্কিল উন্নত করা
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Level -->
+                    <div class="card-glow p-6 rounded-xl mb-8">
+                        <h3 class="text-3xl font-bold mb-4 text-purple">৩. অ্যাডভান্স লেভেল</h3>
+                        <div class="ml-4">
+                            <h4 class="text-2xl font-bold mt-4 mb-2">ভিডিও কোর্স / সিরিজ</h4>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>
+                                    <a href="https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/" target="_blank" class="text-neon-green hover:underline">
+                                        MIT OpenCourseWare – ফ্রি অ্যাডভান্সড কম্পিউটার সায়েন্স কোর্স
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://cs50.harvard.edu/x/" target="_blank" class="text-neon-green hover:underline">
+                                        CS50 Harvard – কম্পিউটার সায়েন্সের গভীর ধারণা
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/@kunalkushwaha" target="_blank" class="text-neon-green hover:underline">
+                                        Kunal Kushwaha – DevOps, Cloud, System Design
+                                    </a>
+                                </li>
+                            </ul>
+                            <h4 class="text-2xl font-bold mt-6 mb-2">ডকুমেন্টেশন / প্র্যাক্টিস</h4>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>
+                                    <a href="https://docs.python.org/3/" target="_blank" class="text-neon-green hover:underline">
+                                        Python Official Docs – পাইথনের অফিসিয়াল রেফারেন্স
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.tensorflow.org/tutorials" target="_blank" class="text-neon-green hover:underline">
+                                        TensorFlow – AI/ML এর অফিসিয়াল টিউটোরিয়াল
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://docs.docker.com/" target="_blank" class="text-neon-green hover:underline">
+                                        Docker Docs – DevOps ও Cloud শেখার জন্য
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tools Section -->
+            <section id="tools" class="min-h-screen p-10 hidden">
+                <h2 class="text-4xl md:text-5xl font-bold mb-10 text-center neon-text-shadow">টুলস সেকশন</h2>
+                <!-- Search Bar -->
+                <div class="flex justify-center mb-8">
+                    <input type="text" placeholder="টুলস খুঁজুন..." class="w-full max-w-md px-4 py-2 bg-black border-2 border-neon-green rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green">
+                </div>
+                <!-- Tools Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 container mx-auto">
+                    <div class="card-glow p-6 rounded-xl text-center">
+                        <i class="fa-solid fa-network-wired text-5xl mb-4 text-purple"></i>
+                        <h3 class="text-2xl font-bold mb-2">Nmap</h3>
+                        <p class="text-gray-400">নেটওয়ার্ক স্ক্যানিং এর জন্য সবচেয়ে জনপ্রিয় ওপেন-সোর্স টুল।</p>
+                        <a href="https://nmap.org/dist/nmap-7.95-setup.exe" target="_blank" class="text-neon-green mt-4 inline-block">ডাউনলোড</a>
+                    </div>
+                    <div class="card-glow p-6 rounded-xl text-center">
+                        <i class="fa-solid fa-wifi text-5xl mb-4 text-purple"></i>
+                        <h3 class="text-2xl font-bold mb-2">Wireshark</h3>
+                        <p class="text-gray-400">নেটওয়ার্ক ট্র্যাফিক অ্যানালাইসিস এর জন্য একটি শক্তিশালী টুল।</p>
+                        <a href="https://www.wireshark.org/download.html" target="_blank" class="text-neon-green mt-4 inline-block">ডাউনলোড</a>
+                    </div>
+                    <div class="card-glow p-6 rounded-xl text-center">
+                        <i class="fa-solid fa-globe text-5xl mb-4 text-purple"></i>
+                        <h3 class="text-2xl font-bold mb-2">Burp Suite</h3>
+                        <p class="text-gray-400">ওয়েব অ্যাপ্লিকেশন সিকিউরিটি টেস্টিংয়ের জন্য একটি টুলস স্যুট।</p>
+                        <a href="https://portswigger.net/burp/communitydownload" target="_blank" class="text-neon-green mt-4 inline-block">ডাউনলোড</a>
+                    </div>
+                    <div class="card-glow p-6 rounded-xl text-center">
+                        <i class="fa-solid fa-flask text-5xl mb-4 text-purple"></i>
+                        <h3 class="text-2xl font-bold mb-2">Metasploit</h3>
+                        <p class="text-gray-400">এক্সপ্লয়ট ডেভেলপমেন্ট এবং পেনেট্রেশন টেস্টিং ফ্রেমওয়ার্ক।</p>
+                        <a href="https://www.metasploit.com/download" target="_blank" class="text-neon-green mt-4 inline-block">ডাউনলোড</a>
+                    </div>
+                </div>
+                <div class="mt-10 p-6 text-center text-red-400 border-2 border-red-500 rounded-lg max-w-4xl mx-auto neon-button-glow">
+                    <h4 class="text-2xl font-bold mb-2">সতর্কবার্তা!</h4>
+                    <p>এই টুলগুলো শুধুমাত্র শিক্ষামূলক এবং বৈধ পরীক্ষার উদ্দেশ্যে ব্যবহার করুন। অবৈধ কার্যকলাপে ব্যবহার করা কঠোরভাবে নিষিদ্ধ।</p>
+                </div>
+
+                <!-- Gemini API Integration: Vulnerability Explainer Section -->
+                <div class="mt-12 pt-8 border-t-2 border-neon-green">
+                    <h3 class="text-3xl font-bold mb-4 text-purple">Vulnerability & Topic Explainer ✨</h3>
+                    <p class="text-gray-300 mb-4">
+                        যেকোনো সাইবার নিরাপত্তা বিষয়ক দুর্বলতা (Vulnerability) বা টপিক সম্পর্কে জানতে এখানে টাইপ করুন। জেমিনি এআই আপনাকে বিস্তারিত ব্যাখ্যা দেবে।
+                    </p>
+                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
+                        <input type="text" id="gemini-explainer-input" class="flex-grow w-full px-4 py-2 bg-black border-2 border-neon-green rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green text-white" placeholder="যেমন: SQL Injection, Phishing, DoS Attack...">
+                        <button id="gemini-explainer-btn" class="px-8 py-3 bg-transparent text-white font-bold rounded-lg border-2 border-neon-green neon-button-glow transition-all duration-300 hover:bg-neon-green hover:text-black">
+                            ব্যাখ্যা দিন ✨
+                        </button>
+                    </div>
+                    <div id="gemini-explainer-response-container" class="mt-4 p-4 rounded-lg bg-gray-900 border-2 border-purple text-gray-300 min-h-[100px] overflow-auto text-left relative">
+                        <p id="gemini-explainer-response" class="gemini-response"></p>
+                        <div id="loading-explainer-spinner" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-4 border-t-4 border-t-purple border-gray-600 animate-spin"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blog Section -->
+            <section id="blog" class="min-h-screen p-10 hidden">
+                <h2 class="text-4xl md:text-5xl font-bold mb-10 text-center neon-text-shadow">সাইবার নিউজ ও ব্লগ</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 container mx-auto">
+                    <!-- Blog Post 1 -->
+                    <div class="card-glow p-6 rounded-xl">
+                        <h3 class="text-2xl font-bold mb-2">হ্যাকিং থেকে ডেটা সুরক্ষিত রাখার ৫টি উপায়</h3>
+                        <p class="text-gray-400 text-sm mb-4">প্রকাশ: ০৪ আগস্ট, ২০২৪</p>
+                        <p class="text-gray-300">সাইবার হামলা থেকে নিজেকে নিরাপদ রাখতে কিছু সহজ টিপস...</p>
+                        <a href="https://youtu.be/zaXll7Ww0hY?si=aqY-TIK4hJRukCe7" target="_blank" class="mt-4 inline-block px-4 py-2 bg-transparent text-white font-bold rounded-lg border-2 border-neon-green neon-button-glow">Read More</a>
+                    </div>
+                    <!-- Blog Post 2 -->
+                    <div class="card-glow p-6 rounded-xl">
+                        <h3 class="text-2xl font-bold mb-2">সর্বশেষ সাইবার অ্যাটাক: এর থেকে কী শিখব?</h3>
+                        <p class="text-gray-400 text-sm mb-4">প্রকাশ: ০২ আগস্ট, ২০২৪</p>
+                        <p class="text-gray-300">একটি সাম্প্রতিক সাইবার হামলার বিশ্লেষণ এবং প্রতিরোধের কৌশল...</p>
+                        <a href="https://youtu.be/8UfdwQJtI48?si=PzTU578ZKD7tOEtX" target="_blank" class="mt-4 inline-block px-4 py-2 bg-transparent text-white font-bold rounded-lg border-2 border-neon-green neon-button-glow">Read More</a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Community Section -->
+            <section id="community" class="min-h-screen p-10 hidden">
+                <h2 class="text-4xl md:text-5xl font-bold mb-10 text-center neon-text-shadow">কমিউনিটি</h2>
+                <div class="card-glow p-6 rounded-xl max-w-5xl mx-auto text-left mb-8">
+                    <p class="text-lg text-gray-300 mb-4">
+                        অন্যান্য ইউজারদের সাথে আলোচনা করুন এবং প্রশ্ন করুন। বিশ্বের কিছু প্রধান হ্যাকিং কমিউনিটি ও ফোরাম নিচে বিস্তারিতভাবে তুলে ধরা হলো:
+                    </p>
+                    <hr class="border-neon-green mb-4">
+                    <h2 class="text-3xl font-bold mb-4 text-purple">১. Open & Ethical Hacking কমিউনিটি</h2>
+                    <ul class="list-disc list-inside space-y-2 text-gray-300 ml-4">
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">HackThisSite.org</h3>
+                            <p>একটি আইনগত ও শিক্ষামূলক প্ল্যাটফর্ম যেখানে ইউজাররা বিভিন্ন ধাপে হ্যাকিং চ্যালেঞ্জ গ্রহণ করে দক্ষতা শিখতে পারেন (<a href="https://en.wikipedia.org/wiki/HackThisSite?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Wikipedia</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">HackerOne Community</h3>
+                            <p>বিশ্বের সবচেয়ে বড় ethical hacking প্ল্যাটফর্ম, যেখানে ইউজাররা বাগ রিপোর্ট সাবমিট করে এবং প্রতিদান পাচ্ছে, Hacker101 ইভেন্ট ও Discord-based ফোরাম সরবরাহ করে (<a href="https://www.hackerone.com/hackers/how-to-start-hacking?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">HackerOne</a>)।</p>
+                        </li>
+                    </ul>
+                    <hr class="border-neon-green my-4">
+                    <h2 class="text-3xl font-bold mb-4 text-purple">২. Dark Web / Deep Web হ্যাকিং ফোরাম</h2>
+                    <ul class="list-disc list-inside space-y-2 text-gray-300 ml-4">
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">Dread</h3>
+                            <p>Reddit-style dark web ফোরাম, where sub-communities নিয়ে discussion হয় data leaks ও illicit hacking topics নিয়ে, অনেক পোস্ট প্রতি দিন হয় (<a href="https://socradar.io/top-10-deep-web-and-dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">SOCRadar® Cyber Intelligence Inc.</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">CryptBB</h3>
+                            <p>AES-256 CTR ও RSA encryption সহ উচ্চ-প্রাইভেসি dark web ফোরাম, elite hackers ও beginners উভয়ের জন্য পরিবেশ তৈরি করে discussion এবং মাল্টলেভেল নিরাপদ যোগাযোগের জন্য (<a href="https://flare.io/learn/resources/blog/dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">flare.io</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">LeakBase</h3>
+                            <p>BreachForums-এর পরবর্তী ফোরামের উদ্যোগ, stolen data বিক্রির জন্য জনপ্রিয়, দ্রুতবর্ধনশীল deep web ফোরাম (<a href="https://socradar.io/top-10-deep-web-and-dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">SOCRadar® Cyber Intelligence Inc.</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">FreeHacks</h3>
+                            <p>রাছিয়ান ভিত্তিক dark web ফোরাম, carding, DDoS, hacking tools জন্য বৃহত্তম ডাটাবেস, strict vetting process সহ (<a href="https://flare.io/learn/resources/blog/dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">flare.io</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">Exploit.in</h3>
+                            <p>Russian origin, surface ও deep/Dark Web উভয় জায়গায় সক্রিয়, exploits / malware trade ও knowledge-sharing এর জন্য পরিচিত (<a href="https://flare.io/learn/resources/blog/dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">flare.io</a>, <a href="https://cyble.com/knowledge-hub/top-10-dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Cyble</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">Cracked.to</h3>
+                            <p>Deep web forum যেখানে hacking, cracking ও data leaks আলোচনা হয়; ৩ মিলিয়নের বেশি সদস্য ও ১৭ মিলিয়নেরও বেশি পোস্ট রয়েছে (<a href="https://cyble.com/knowledge-hub/top-10-dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Cyble</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">Altenen</h3>
+                            <p>credit card fraud, financial hacking tools নিয়ে আলোচনা করে এমন lesser-known কিন্তু highly active dark web community (<a href="https://cyble.com/knowledge-hub/top-10-dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Cyble</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">DarkForums</h3>
+                            <p>BreachForums-এর পরবর্তী ফোরামের উদ্যোগ, যেখানে অনেক ব্যবহারকারী স্থানান্তরিত হয়েছিলেন। BreachForums পুনরায় চালু হয়েছে ৩ জুন ২০২৫ তারিখে, DarkForums-এর অভিনেতা darked321 সেই ঘোষণা দিয়েছিলেন (<a href="https://www.zerofox.com/intelligence/breachforums-and-notorious-actors-announce-re-emergence/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">zerofox.com</a>)।</p>
+                        </li>
+                    </ul>
+                    <hr class="border-neon-green my-4">
+                    <h2 class="text-3xl font-bold mb-4 text-purple">৩. Surface Web / Hacker Culture ফোরাম ও কমিউনিটি</h2>
+                    <ul class="list-disc list-inside space-y-2 text-gray-300 ml-4">
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">Hack Forums</h3>
+                            <p>২০০৭ সালে চালু, প্রধানত আমেরিকান ও ইংরেজি ভাষাভিত্তিক forum যেখানে hacking culture, tools, লোমহর্ষক software Tools সম্পর্কিত আলোচনা হয়। Alexa ranking অনুসারে শীর্ষ hacking category প্ল্যাটফর্ম (<a href="https://en.wikipedia.org/wiki/Hack_Forums?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Wikipedia</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">Digital DawgPound (DDP)</h3>
+                            <p>BinRev project-এর অংশ, positive hacking community হিসাবে পরিচিত, ব্লগ, radio shows, forums ও hacker-focused content-sharing platform যা বিভিন্ন হ্যাকিং সম্মেলনে প্রতিনিধিত্ব করে (<a href="https://en.wikipedia.org/wiki/Digital_DawgPound?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Wikipedia</a>)।</p>
+                        </li>
+                        <li>
+                            <h3 class="text-2xl font-bold mb-1 text-neon-green">Hackaday / Hackaday.io</h3>
+                            <p>hardware hacking & open-source electronics ভিত্তিক ব্লগ ও প্রকল্প হোস্টিং কমিউনিটি; DIY প্রোজেক্ট ও প্রকৌশল শক্তির জন্য জনাকর্ষক (<a href="https://en.wikipedia.org/wiki/Hackaday?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Wikipedia</a>)।</p>
+                        </li>
+                    </ul>
+                    <hr class="border-neon-green my-4">
+                    <h2 class="text-3xl font-bold mb-4 text-purple">৪. Hacktivism ও Hacker Groups</h2>
+                    <p class="text-gray-300 ml-4">
+                        বিশেষ ফোরাম ছাড়া অনেক hacktivist groups যেমন <strong>Anonymous</strong>, <strong>RedHack</strong>, <strong>ShinyHunters</strong>, ইত্যাদি নির্দিষ্ট বাস্তবিক ফোরাম না হলেও Telegram/Discord প্ল্যাটফর্মে সক্রিয়। Discord বর্তমানে অনেক hacking কমিউনিটি ও তথ্য শেয়ারিং এর জায়গা হিসেবে ব্যবহৃত হচ্ছে (<a href="https://en.wikipedia.org/wiki/List_of_hacker_groups?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Wikipedia</a>)।
+                    </p>
+                    <hr class="border-neon-green my-4">
+                    <h2 class="text-3xl font-bold mb-4 text-purple">সারণীতে সারসংক্ষেপ</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left table-auto border-collapse">
+                            <thead>
+                                <tr class="bg-gray-800 text-neon-green">
+                                    <th class="p-4 border border-neon-green">ধরণ</th>
+                                    <th class="p-4 border border-neon-green">প্ল্যাটফর্ম নাম</th>
+                                    <th class="p-4 border border-neon-green">বৈশিষ্ট্য</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="p-4 border border-neon-green">Ethical Learning</td>
+                                    <td class="p-4 border border-neon-green">HackThisSite, HackerOne</td>
+                                    <td class="p-4 border border-neon-green">সেফ ও বৈধ পদ্ধতিতে হ্যাকিং শেখা ও CTF খেলা</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 border border-neon-green">Dark Web Forums</td>
+                                    <td class="p-4 border border-neon-green">Dread, CryptBB, LeakBase, FreeHacks, Exploit.in, Cracked.to, Altenen</td>
+                                    <td class="p-4 border border-neon-green">গোপন, encrypted forums where illegal hacking ইত্যাদি হয়</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 border border-neon-green">Surface/Web Forums</td>
+                                    <td class="p-4 border border-neon-green">Hack Forums, Digital DawgPound, Hackaday</td>
+                                    <td class="p-4 border border-neon-green">hacking culture, tutorials, tools, hardware projects</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 border border-neon-green">Hacktivism Groups</td>
+                                    <td class="p-4 border border-neon-green">Anonymous, ShinyHunters, Discord/Telegram communities</td>
+                                    <td class="p-4 border border-neon-green">রাজনৈতিক বা সামাজিক উদ্দেশ্যে hacking কর্মসূচি</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr class="border-neon-green my-4">
+                    <ul class="list-disc list-inside space-y-2 text-gray-300 ml-4">
+                        <li>
+                            <p><strong>HackForums</strong> কে নিয়েও বিতর্ক আছে: teenage hackers ও malicious তৈরি জন্য চাইলে অভিযোগ এসেছিল (<a href="https://www.bitsight.com/learn/cti/dark-web-forums?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Bitsight</a>, <a href="https://cyble.com/knowledge-hub/top-10-dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Cyble</a>, <a href="https://flare.io/learn/resources/blog/dark-web-forums/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">flare.io</a>, <a href="https://en.wikipedia.org/wiki/Hack_Forums?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">Wikipedia</a>)।</p>
+                        </li>
+                        <li>
+                            <p><strong>DarkForums/BreachForums</strong> এর নিয়ন্ত্রণ নিয়ে চলছিল অভিযোজন ও পুনরায় domain চালু হওয়ার ঘটনা যা আবার law enforcement এর নজরে এসেছে (<a href="https://www.zerofox.com/intelligence/breachforums-and-notorious-actors-announce-re-emergence/?utm_source=chatgpt.com" target="_blank" class="text-cyan-400 hover:underline">zerofox.com</a>)।</p>
+                        </li>
+                    </ul>
+                    
+                    <!-- Gemini API Integration: Cyber Assistant Section -->
+                    <div class="mt-8 pt-8 border-t-2 border-neon-green">
+                        <h3 class="text-3xl font-bold mb-4 text-purple">সাইবার অ্যাসিস্ট্যান্ট ✨</h3>
+                        <p class="text-gray-300 mb-4">
+                            নৈতিক হ্যাকিং বা সাইবার সিকিউরিটি সম্পর্কিত যেকোনো প্রশ্ন এখানে জিজ্ঞাসা করুন। জেমিনি এআই আপনাকে সাহায্য করবে।
+                        </p>
+                        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
+                            <textarea id="gemini-input" rows="4" class="flex-grow w-full px-4 py-2 bg-black border-2 border-neon-green rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green text-white" placeholder="আপনার প্রশ্ন এখানে লিখুন..."></textarea>
+                            <button id="gemini-ask-btn" class="px-8 py-3 bg-transparent text-white font-bold rounded-lg border-2 border-neon-green neon-button-glow transition-all duration-300 hover:bg-neon-green hover:text-black">
+                                উত্তর দিন ✨
+                            </button>
+                        </div>
+                        <div id="gemini-response-container" class="mt-4 p-4 rounded-lg bg-gray-900 border-2 border-purple text-gray-300 min-h-[100px] overflow-auto text-left relative">
+                            <p id="gemini-response" class="gemini-response"></p>
+                            <div id="loading-spinner" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-4 border-t-4 border-t-purple border-gray-600 animate-spin"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Contact Section -->
+            <section id="contact" class="min-h-screen p-10 hidden">
+                <h2 class="text-4xl md:text-5xl font-bold mb-10 text-center neon-text-shadow">যোগাযোগ ও সোশ্যাল লিংক</h2>
+                <div class="flex flex-col items-center max-w-lg mx-auto">
+                    <form class="w-full">
+                        <div class="mb-4">
+                            <input type="text" placeholder="আপনার নাম" class="w-full px-4 py-2 bg-black border-2 border-neon-green rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green">
+                        </div>
+                        <div class="mb-4">
+                            <input type="email" placeholder="আপনার ইমেইল" class="w-full px-4 py-2 bg-black border-2 border-neon-green rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green">
+                        </div>
+                        <div class="mb-4">
+                            <textarea rows="4" placeholder="আপনার মেসেজ" class="w-full px-4 py-2 bg-black border-2 border-neon-green rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green"></textarea>
+                        </div>
+                        <button type="submit" class="px-8 py-3 w-full bg-transparent text-white font-bold rounded-lg border-2 border-neon-green neon-button-glow transition-all duration-300 hover:bg-neon-green hover:text-black">
+                            পাঠান
+                        </button>
+                    </form>
+                    <div class="mt-8 flex justify-center space-x-6 text-3xl">
+                        <a href="https://web.facebook.com/profile.php?id=61577052354104" target="_blank" class="text-gray-400 hover:text-blue-600 transition-colors duration-300"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.youtube.com/@JMATHCODE" target="_blank" class="text-gray-400 hover:text-red-600 transition-colors duration-300"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.instagram.com/jmathcode/?__pwa=1" target="_blank" class="text-gray-400 hover:text-pink-500 transition-colors duration-300"><i class="fab fa-instagram"></i></a>
+                        <a href="https://x.com/jia75984" target="_blank" class="text-gray-400 hover:text-blue-400 transition-colors duration-300"><i class="fab fa-x-twitter"></i></a>
+                        <a href="https://web.telegram.org/a/#8135521250" target="_blank" class="text-gray-400 hover:text-cyan-500 transition-colors duration-300"><i class="fab fa-telegram"></i></a>
+                        <a href="https://www.threads.com/?xmt=AQF0TRiB6YtDnv0WOOkTPsGY3yDj81vjpwV8pFCsfiqx9Gg" target="_blank" class="text-gray-400 hover:text-purple-600 transition-colors duration-300"><i class="fa-brands fa-threads"></i></a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript for the Code Rain Effect and Page Navigation -->
+    <script>
+        // Matrix Code Rain Effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const katakana = 'アァカサタナハマヤャラワガザダバパ';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const nums = '0123456789';
+        const chars = katakana + latin + nums;
+
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00FF41';
+            ctx.font = fontSize + 'px Monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+
+                drops[i]++;
+            }
+        }
+        
+        function handleResize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const columns = canvas.width / fontSize;
+            drops.length = Math.floor(columns);
+            for (let i = 0; i < drops.length; i++) {
+                drops[i] = Math.floor(Math.random() * (canvas.height / fontSize));
+            }
+        }
+        
+        // Page Navigation Logic
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+        }
+        
+        // Modal Logic
+        const ceoModal = document.getElementById('ceo-modal');
+        const showCeoModalBtn = document.getElementById('show-ceo-modal');
+        const closeCeoModalBtn = document.getElementById('close-ceo-modal');
+
+        showCeoModalBtn.addEventListener('click', () => {
+            ceoModal.classList.remove('hidden');
+        });
+
+        closeCeoModalBtn.addEventListener('click', () => {
+            ceoModal.classList.add('hidden');
+        });
+
+        // Close modal if user clicks outside of it
+        window.addEventListener('click', (event) => {
+            if (event.target === ceoModal) {
+                ceoModal.classList.add('hidden');
+            }
+        });
+
+        // Event Listeners
+        window.onload = function() {
+            setInterval(draw, 33);
+            window.addEventListener('resize', handleResize);
+
+            // Hide all sections except home on load
+            showSection('home');
+            
+            // Add click event listeners to navigation links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = link.getAttribute('href').substring(1);
+                    showSection(sectionId);
+                    window.scrollTo(0, 0); // Scroll to top
+                    document.getElementById('mobile-menu').style.display = 'none'; // Close mobile menu if open
+                });
+            });
+
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('mobile-menu').style.display = 'flex';
+            });
+
+            document.getElementById('close-menu-btn').addEventListener('click', () => {
+                document.getElementById('mobile-menu').style.display = 'none';
+            });
+
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = link.getAttribute('href').substring(1);
+                    showSection(sectionId);
+                    document.getElementById('mobile-menu').style.display = 'none';
+                    window.scrollTo(0, 0);
+                });
+            });
+        }
+        
+        // --- Gemini API Integration Logic (Community Section) ---
+
+        const geminiInput = document.getElementById('gemini-input');
+        const geminiAskBtn = document.getElementById('gemini-ask-btn');
+        const geminiResponse = document.getElementById('gemini-response');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        async function fetchGeminiResponse(prompt) {
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const maxRetries = 5;
+            let currentRetry = 0;
+            while (currentRetry < maxRetries) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API Error: ${response.status} - ${errorData.error.message}`);
+                    }
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        return result.candidates[0].content.parts[0].text;
+                    } else {
+                        throw new Error('Gemini API returned an unexpected response format.');
+                    }
+                } catch (error) {
+                    console.error('API call failed:', error);
+                    currentRetry++;
+                    if (currentRetry < maxRetries) {
+                        const delay = Math.pow(2, currentRetry) * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+            throw new Error('Maximum retries exceeded. Failed to get a response from Gemini.');
+        }
+
+        async function askGemini() {
+            const userQuestion = geminiInput.value.trim();
+            if (userQuestion === '') {
+                geminiResponse.textContent = 'দয়া করে আপনার প্রশ্ন লিখুন।';
+                return;
+            }
+
+            geminiAskBtn.disabled = true;
+            loadingSpinner.classList.remove('hidden');
+            geminiResponse.textContent = ''; // Clear previous response
+            
+            const typingEffect = (text) => {
+                let i = 0;
+                geminiResponse.textContent = '';
+                const interval = setInterval(() => {
+                    if (i < text.length) {
+                        geminiResponse.textContent += text.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        geminiResponse.classList.remove('blinking-cursor');
+                    }
+                }, 20); // Adjust typing speed here
+            };
+
+            const fullPrompt = `একজন সাইবার নিরাপত্তা বিশেষজ্ঞের মতো কাজ করুন এবং নিম্নলিখিত প্রশ্নটির একটি বিস্তারিত, সহায়ক এবং নৈতিক উত্তর দিন। উত্তরটি অবশ্যই বাংলা ভাষায় হতে হবে। প্রশ্ন: "${userQuestion}"`;
+
+            try {
+                const apiResponseText = await fetchGeminiResponse(fullPrompt);
+                
+                geminiResponse.classList.add('blinking-cursor');
+                
+                typingEffect(apiResponseText);
+            } catch (error) {
+                console.error('Failed to get Gemini response:', error);
+                geminiResponse.textContent = 'দুঃখিত, আপনার প্রশ্নের উত্তর দিতে ব্যর্থ। আবার চেষ্টা করুন।';
+            } finally {
+                geminiAskBtn.disabled = false;
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+        
+        geminiAskBtn.addEventListener('click', askGemini);
+        geminiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                askGemini();
+            }
+        });
+
+        // --- New Gemini API Integration Logic (Tools Section) ---
+        
+        const explainerInput = document.getElementById('gemini-explainer-input');
+        const explainerBtn = document.getElementById('gemini-explainer-btn');
+        const explainerResponse = document.getElementById('gemini-explainer-response');
+        const explainerSpinner = document.getElementById('loading-explainer-spinner');
+
+        async function getExplainerResponse() {
+            const userTopic = explainerInput.value.trim();
+            if (userTopic === '') {
+                explainerResponse.textContent = 'দয়া করে একটি বিষয় বা দুর্বলতার নাম লিখুন।';
+                return;
+            }
+
+            explainerBtn.disabled = true;
+            explainerSpinner.classList.remove('hidden');
+            explainerResponse.textContent = ''; // Clear previous response
+
+            const typingEffect = (text) => {
+                let i = 0;
+                explainerResponse.textContent = '';
+                const interval = setInterval(() => {
+                    if (i < text.length) {
+                        explainerResponse.textContent += text.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        explainerResponse.classList.remove('blinking-cursor');
+                    }
+                }, 20); // Adjust typing speed here
+            };
+            
+            // The prompt for the new feature
+            const explainerPrompt = `একজন সাইবার নিরাপত্তা বিশেষজ্ঞের মতো কাজ করুন এবং নিম্নলিখিত সাইবার নিরাপত্তা দুর্বলতা বা বিষয়টির একটি বিস্তারিত, শিক্ষামূলক এবং নৈতিক ব্যাখ্যা দিন। এর আক্রমণ কৌশল (Attack Techniques) এবং প্রতিরোধ কৌশল (Prevention Methods) সম্পর্কেও আলোচনা করুন। উত্তরটি অবশ্যই বাংলা ভাষায় হতে হবে। বিষয়: "${userTopic}"`;
+
+            try {
+                const apiResponseText = await fetchGeminiResponse(explainerPrompt);
+                
+                explainerResponse.classList.add('blinking-cursor');
+                
+                typingEffect(apiResponseText);
+            } catch (error) {
+                console.error('Failed to get explainer response:', error);
+                explainerResponse.textContent = 'দুঃখিত, আপনার প্রশ্নের উত্তর দিতে ব্যর্থ। আবার চেষ্টা করুন।';
+            } finally {
+                explainerBtn.disabled = false;
+                explainerSpinner.classList.add('hidden');
+            }
+        }
+
+        explainerBtn.addEventListener('click', getExplainerResponse);
+        explainerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                getExplainerResponse();
+            }
+        });
+        
+    </script>
+</body>
+</html>
